@@ -1,1 +1,1 @@
-from st_oauth.st_oauth import st_oauth
+from st_oauth.st_oauth import st_oauth, logout
