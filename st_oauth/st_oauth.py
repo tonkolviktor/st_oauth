@@ -53,9 +53,11 @@ def validate_token(token, config):
         data = jwt.decode(token['access_token'], signing_key.key, algorithms=["RS256"], audience=audience, leeway=leeway)
     except (jwt.exceptions.ExpiredSignatureError):
         return False, 'Expired'
-    except:
-        return False, 'Invalid'
-    return True, data[config['identity_field_in_token']] if 'identity_field_in_token' in config and config['identity_field_in_token'] in data else 'OK'
+    except Exception as e:
+        return False, f'Invalid - {str(e)}'
+    if config['identity_field_in_token'] != '_COMPLETE_':
+        data = data[config['identity_field_in_token']] if 'identity_field_in_token' in config and config['identity_field_in_token'] in data else 'OK'
+    return True, data
 
 def st_oauth(config=None, label="Login via OAuth"):
     if not config:
@@ -64,10 +66,10 @@ def st_oauth(config=None, label="Login via OAuth"):
         config = st.secrets[config]
     if _STKEY in st.session_state:
         token = st.session_state[_STKEY]
-        valid, msg = validate_token(token, config)
+        valid, data = validate_token(token, config)
         if not valid:
             del st.session_state[_STKEY]
-            st.warning(f"OAuth Token {msg}")
+            st.warning(f"OAuth Token {data}")
     if _STKEY not in st.session_state:
         if not validate_config(config):
             st.error("Invalid OAuth Configuration")
@@ -99,13 +101,13 @@ def st_oauth(config=None, label="Login via OAuth"):
             st.error(e)
             show_auth_link(config, label)
         token = ret.json()
-        valid, msg = validate_token(token, config)
+        valid, data = validate_token(token, config)
         if valid:
             st.session_state[_STKEY] = token
         else:
             st.error("Invalid OAuth Token")
             show_auth_link(config, label)
 
-    if _STKEY in st.session_state:
+    if config.get('add_logout_to_sidebar', True) and _STKEY in st.session_state:
         st.sidebar.button("Logout", on_click=logout)
-    return msg
+    return data

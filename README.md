@@ -53,9 +53,10 @@ The necessary fields of the function are:
 * `client_secret` - the client secret for the client ID, as configured in the OAuth provider
 * `scope` - the OAuth scope to use, as configured in the OAuth provider
 * `audience` - (optional) the audience as configured in the OAuth provider
-* `identity_field_in_token` -  (optional) which field in the returned token that contains the identity (usually it is `sub` or `upn`). This is the field that will be returned from the `st_oauth()` call. If unset or not found in the token, `OK` will be returned.
+* `identity_field_in_token` -  (optional) which field in the returned token that contains the identity (usually it is `sub` or `upn`). This is the field that will be returned from the `st_oauth()` call. If unset or not found in the token, `OK` will be returned. IF set to `_COMPLETE_` the complete user object will be returned
 * `leeway` - (optional) in seconds to account for clock skew 
-
+* `add_logout_to_sidebar` - (optional) if False login button will not be shown automatically, use st.oauth.logout()
+* 
 If `st_oauth()` is called without a `config` parameter, it will look for the 
 configuration parameters in the secrets file (`st.secrets`) using the default
 name `oauth`.
@@ -74,8 +75,9 @@ client_id = "<OAUTH CLIENT ID>"
 client_secret = "<OAUTH CLIENT SECRET>"
 scope = "<OAUTH SCOPE>"
 audience = "<OAUTH AUDIENCE>"
-leeway = "<JWT DECODE SECONDS LEEWAY>"
+leeway = <JWT DECODE SECONDS LEEWAY>
 identity_field_in_token = "<OAUTH TOKEN ID FIELD - sub or upn>"
+add_logout_to_sidebar = 
 ```
 
 If `st_oauth()` is called with a string valued `config` parameter, it will look for the
